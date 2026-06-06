@@ -1,6 +1,7 @@
 # Excel Inspector
 
 A lightweight Python CLI tool that profiles Excel workbooks and generates data quality reports.
+Sheet Doctor supports modern `.xlsx` workbooks and legacy `.xls` workbooks.
 
 ## Features
 
@@ -72,11 +73,24 @@ Run Sheet Doctor against an Excel workbook:
 python -m sheet_doctor.cli Financial_Sample.xlsx report.html
 ```
 
+Legacy `.xls` workbooks are supported as well:
+
+```bash
+python -m sheet_doctor.cli legacy_sales.xls legacy_report.html
+```
+
+More examples:
+
+```bash
+python -m sheet_doctor.cli sales.xlsx report.html
+python -m sheet_doctor.cli legacy_sales.xls report.html
+```
+
 ### Parameters
 
 | Parameter             | Description          |
 | --------------------- | -------------------- |
-| Financial_Sample.xlsx | Input Excel workbook |
+| Financial_Sample.xlsx | Input Excel workbook (`.xlsx` or `.xls`) |
 | report.html           | Output report file   |
 
 ---

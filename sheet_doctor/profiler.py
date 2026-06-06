@@ -1,7 +1,39 @@
 from pathlib import Path
 from typing import Any
+from zipfile import BadZipFile
 
 import pandas as pd
+
+
+SUPPORTED_EXCEL_ENGINES = {
+    ".xlsx": "openpyxl",
+    ".xls": "xlrd",
+}
+
+
+class UnsupportedExcelFormatError(ValueError):
+    """Raised when a workbook path has an unsupported extension."""
+
+
+class MissingExcelDependencyError(RuntimeError):
+    """Raised when the Excel reader dependency for a format is unavailable."""
+
+
+class ExcelReadError(RuntimeError):
+    """Raised when a workbook cannot be read as a valid Excel file."""
+
+
+def get_excel_engine(excel_path: str | Path) -> str:
+    """Return the pandas reader engine for a supported Excel workbook."""
+    suffix = Path(excel_path).suffix.lower()
+    try:
+        return SUPPORTED_EXCEL_ENGINES[suffix]
+    except KeyError as exc:
+        supported = ", ".join(sorted(SUPPORTED_EXCEL_ENGINES))
+        raise UnsupportedExcelFormatError(
+            f"Unsupported Excel format '{suffix or '<none>'}'. "
+            f"Supported formats: {supported}."
+        ) from exc
 
 
 def _profile_column(series: pd.Series) -> dict[str, Any]:
@@ -20,7 +52,27 @@ def _profile_column(series: pd.Series) -> dict[str, Any]:
 def profile_workbook(excel_path: str | Path) -> dict[str, Any]:
     """Read an Excel workbook and return profile data for every sheet."""
     workbook_path = Path(excel_path)
-    sheets = pd.read_excel(workbook_path, sheet_name=None)
+    engine = get_excel_engine(workbook_path)
+
+    try:
+        sheets = pd.read_excel(workbook_path, sheet_name=None, engine=engine)
+    except (ImportError, ModuleNotFoundError) as exc:
+        raise MissingExcelDependencyError(
+            f"Missing dependency for {workbook_path.suffix.lower()} files. "
+            f"Install the '{engine}' package and try again."
+        ) from exc
+    except (BadZipFile, ValueError) as exc:
+        raise ExcelReadError(
+            f"Could not read '{workbook_path}'. The file may be corrupt or "
+            "not a valid Excel workbook."
+        ) from exc
+    except Exception as exc:
+        if exc.__class__.__module__.startswith("xlrd"):
+            raise ExcelReadError(
+                f"Could not read '{workbook_path}'. The file may be corrupt or "
+                "not a valid Excel workbook."
+            ) from exc
+        raise
 
     return {
         "file": str(workbook_path),
