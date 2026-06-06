@@ -1,4 +1,4 @@
-# Excel Inspector
+# Sheet Doctor
 
 A lightweight Python CLI tool that profiles Excel workbooks and generates data quality reports.
 
