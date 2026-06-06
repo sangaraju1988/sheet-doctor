@@ -1,10 +1,6 @@
-# Sheet Doctor
+# Excel Inspector
 
-Sheet Doctor is a lightweight Python CLI tool that profiles Excel workbooks and generates BI-ready data quality reports.
-
-It helps analysts, BI developers, and data engineers quickly understand workbook structure, identify data quality issues, and prepare datasets for reporting and analytics.
-
----
+A lightweight Python CLI tool that profiles Excel workbooks and generates data quality reports.
 
 ## Features
 
@@ -172,4 +168,4 @@ Contributions, feature requests, and bug reports are welcome.
 
 ## License
 
-MIT License
+MIT
