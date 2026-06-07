@@ -99,6 +99,16 @@
       background: #ffffff;
       padding: 16px;
     }
+
+    .warning {
+      border: 1px solid #f59e0b;
+      border-left: 6px solid #d97706;
+      border-radius: 8px;
+      background: #fffbeb;
+      color: #92400e;
+      padding: 16px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -175,6 +185,13 @@
       <h2>Data Quality Issues</h2>
       
         <p class="empty">No missing values or duplicate rows found.</p>
+      
+    </section>
+
+    <section>
+      <h2>PII Detection Summary</h2>
+      
+        <p class="empty">No obvious PII columns were detected based on configured rules.</p>
       
     </section>
 

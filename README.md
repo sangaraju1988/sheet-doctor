@@ -33,6 +33,13 @@ Sheet Doctor supports modern `.xlsx` workbooks and legacy `.xls` workbooks.
 * High missing-value identification
 * Numeric values stored as text detection
 
+### PII Detection
+
+* Zero-configuration PII column detection using the default Markdown dictionary in `pii_columns.md`
+* Case-insensitive column-name matching for common variations such as `first_name`, `First Name`, `phone_number`, `mobile`, `ssn`, and `credit_card`
+* Value-pattern checks for likely email addresses, phone numbers, SSNs, and credit card-like numbers
+* Report output includes only metadata such as sheet name, column name, detected PII type, and detection method
+
 ### Reporting
 
 * HTML report generation
@@ -110,6 +117,11 @@ Data Quality Issues
 ├── Blank Columns
 ├── Data Type Warnings
 
+PII Detection Summary
+├── Detected PII Columns
+├── Detection Method
+├── Sharing Warning
+
 Column Profiles
 ├── Numeric Statistics
 ├── Text Frequencies
@@ -117,6 +129,17 @@ Column Profiles
 
 HTML Report
 ```
+
+## PII Detection Notes
+
+Sheet Doctor's PII detection is heuristic. It checks configured column-name rules from
+`pii_columns.md` and simple value patterns for likely email addresses, phone numbers,
+SSNs, and credit card-like numbers. The report does not store or print actual sensitive
+cell values.
+
+These rules are intended to flag obvious risks, not to prove a workbook is safe. Users
+should still manually review sensitive workbooks before sharing them or uploading them
+to AI tools.
 
 ---
 
@@ -134,6 +157,7 @@ sheet-doctor/
 ├── templates/
 │   └── report.html
 │
+├── pii_columns.md
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -148,6 +172,7 @@ sheet-doctor/
 * [x] Excel workbook profiling
 * [x] Data quality checks
 * [x] HTML report generation
+* [x] PII detection
 
 ### Version 1.1
 
@@ -163,7 +188,6 @@ sheet-doctor/
 
 ### Version 2.0
 
-* [ ] PII detection
 * [ ] Data governance checks
 * [ ] AI-powered data documentation
 * [ ] Dashboard readiness scoring

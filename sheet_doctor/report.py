@@ -35,6 +35,15 @@ def _quality_issues(profile: dict[str, Any]) -> list[dict[str, Any]]:
     return issues
 
 
+def _pii_detections(profile: dict[str, Any]) -> list[dict[str, Any]]:
+    detections = []
+
+    for sheet in profile.get("sheets", []):
+        detections.extend(sheet.get("pii_columns", []))
+
+    return detections
+
+
 def generate_report(profile: dict[str, Any], report_path: str | Path) -> None:
     """Generate an HTML workbook profile report."""
     output_path = Path(report_path)
@@ -49,5 +58,6 @@ def generate_report(profile: dict[str, Any], report_path: str | Path) -> None:
     html = template.render(
         profile=profile,
         quality_issues=_quality_issues(profile),
+        pii_detections=_pii_detections(profile),
     )
     output_path.write_text(html, encoding="utf-8")

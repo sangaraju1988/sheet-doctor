@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sheet Doctor Report</title>
+  <style>
+    body {
+      margin: 0;
+      color: #1f2933;
+      background: #f7f8fa;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #111827;
+      line-height: 1.2;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    h2 {
+      margin: 32px 0 12px;
+      font-size: 22px;
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 18px;
+    }
+
+    .muted {
+      color: #667085;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .metric span {
+      display: block;
+      color: #667085;
+      font-size: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 24px;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      border: 1px solid #d9dee7;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f6;
+      color: #344054;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .empty {
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .warning {
+      border: 1px solid #f59e0b;
+      border-left: 6px solid #d97706;
+      border-radius: 8px;
+      background: #fffbeb;
+      color: #92400e;
+      padding: 16px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Sheet Doctor Report</h1>
+    <p class="muted">MOCK_DATA.xlsx</p>
+
+    <section>
+      <h2>Workbook Summary</h2>
+      <div class="summary">
+        <div class="metric">
+          <span>Sheets</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Total rows</span>
+          <strong>1000</strong>
+        </div>
+        <div class="metric">
+          <span>Total columns</span>
+          <strong>7</strong>
+        </div>
+        <div class="metric">
+          <span>Missing values</span>
+          <strong>0</strong>
+        </div>
+        <div class="metric">
+          <span>Duplicate rows</span>
+          <strong>0</strong>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Sheet</th>
+            <th>Rows</th>
+            <th>Columns</th>
+            <th>Missing values</th>
+            <th>Duplicate rows</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td>data</td>
+              <td>1000</td>
+              <td>7</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Data Quality Issues</h2>
+      
+        <p class="empty">No missing values or duplicate rows found.</p>
+      
+    </section>
+
+    <section>
+      <h2>PII Detection Summary</h2>
+      
+        <p class="warning">Warning: This workbook may contain personally identifiable information. Be careful when sharing this file with others or uploading it to AI tools.</p>
+        
+          
+            <h3>data</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sheet</th>
+                  <th>Column</th>
+                  <th>Detected PII type</th>
+                  <th>Detection method</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                  <tr>
+                    <td>data</td>
+                    <td>first_name</td>
+                    <td>First Name</td>
+                    <td>column name match</td>
+                  </tr>
+                
+                  <tr>
+                    <td>data</td>
+                    <td>last_name</td>
+                    <td>Last Name</td>
+                    <td>column name match</td>
+                  </tr>
+                
+                  <tr>
+                    <td>data</td>
+                    <td>email</td>
+                    <td>Email</td>
+                    <td>column name match</td>
+                  </tr>
+                
+                  <tr>
+                    <td>data</td>
+                    <td>ip_address</td>
+                    <td>Phone Number</td>
+                    <td>value pattern match</td>
+                  </tr>
+                
+                  <tr>
+                    <td>data</td>
+                    <td>phone</td>
+                    <td>Phone Number</td>
+                    <td>column name match</td>
+                  </tr>
+                
+              </tbody>
+            </table>
+          
+        
+      
+    </section>
+
+    <section>
+      <h2>Column Profiles</h2>
+      
+        <h3>data</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Missing values</th>
+              <th>Missing percent</th>
+              <th>Unique values</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>id</td>
+                <td>int64</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>1000</td>
+              </tr>
+            
+              <tr>
+                <td>first_name</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>946</td>
+              </tr>
+            
+              <tr>
+                <td>last_name</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>989</td>
+              </tr>
+            
+              <tr>
+                <td>email</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>1000</td>
+              </tr>
+            
+              <tr>
+                <td>gender</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>8</td>
+              </tr>
+            
+              <tr>
+                <td>ip_address</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>1000</td>
+              </tr>
+            
+              <tr>
+                <td>phone</td>
+                <td>str</td>
+                <td>0</td>
+                <td>0.00%</td>
+                <td>1000</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+    </section>
+  </main>
+</body>
+</html>

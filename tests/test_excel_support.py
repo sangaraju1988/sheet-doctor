@@ -8,6 +8,7 @@ from typer.testing import CliRunner
 
 from sheet_doctor.cli import app
 from sheet_doctor.profiler import profile_workbook
+from sheet_doctor.report import generate_report
 
 
 runner = CliRunner()
@@ -45,6 +46,107 @@ class ExcelSupportTests(unittest.TestCase):
         self.assertEqual(profile["sheet_count"], 1)
         self.assertEqual(profile["sheets"][0]["row_count"], 2)
         self.assertEqual(profile["sheets"][0]["column_count"], 2)
+
+    def test_detects_pii_from_column_name_dictionary(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "customers.xlsx"
+            pd.DataFrame(
+                {
+                    "First Name": ["Ada", "Grace"],
+                    "phone_number": ["555-123-4567", "555-987-6543"],
+                    "order_total": [10, 20],
+                }
+            ).to_excel(workbook, index=False, engine="openpyxl")
+
+            profile = profile_workbook(workbook)
+
+        pii_columns = profile["sheets"][0]["pii_columns"]
+        self.assertEqual(
+            {(item["column"], item["pii_type"], item["detection_method"]) for item in pii_columns},
+            {
+                ("First Name", "First Name", "column name match"),
+                ("phone_number", "Phone Number", "column name match"),
+            },
+        )
+
+    def test_detects_pii_from_value_patterns_without_storing_values(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "contacts.xlsx"
+            pd.DataFrame(
+                {
+                    "contact": ["ada@example.com", "grace@example.com"],
+                    "notes": ["ok", "ok"],
+                }
+            ).to_excel(workbook, index=False, engine="openpyxl")
+
+            profile = profile_workbook(workbook)
+
+        pii_columns = profile["sheets"][0]["pii_columns"]
+        self.assertEqual(len(pii_columns), 1)
+        self.assertEqual(pii_columns[0]["column"], "contact")
+        self.assertEqual(pii_columns[0]["pii_type"], "Email")
+        self.assertEqual(pii_columns[0]["detection_method"], "value pattern match")
+        self.assertNotIn("ada@example.com", str(profile))
+
+    def test_report_includes_pii_warning_and_summary(self) -> None:
+        profile = {
+            "file": "customers.xlsx",
+            "sheet_count": 1,
+            "sheets": [
+                {
+                    "name": "Customers",
+                    "row_count": 2,
+                    "column_count": 1,
+                    "missing_values": 0,
+                    "duplicate_rows": 0,
+                    "columns": [],
+                    "pii_columns": [
+                        {
+                            "sheet": "Customers",
+                            "column": "email",
+                            "pii_type": "Email",
+                            "detection_method": "column name match",
+                            "reason": "Column name matched configured pattern 'email'",
+                        }
+                    ],
+                }
+            ],
+        }
+
+        with TemporaryDirectory() as tmpdir:
+            report = Path(tmpdir) / "report.html"
+            generate_report(profile, report)
+            html = report.read_text(encoding="utf-8")
+
+        self.assertIn("PII Detection Summary", html)
+        self.assertIn("Warning: This workbook may contain personally identifiable information.", html)
+        self.assertIn("Customers", html)
+        self.assertIn("email", html)
+        self.assertIn("column name match", html)
+
+    def test_report_includes_no_pii_message(self) -> None:
+        profile = {
+            "file": "sales.xlsx",
+            "sheet_count": 1,
+            "sheets": [
+                {
+                    "name": "Sales",
+                    "row_count": 1,
+                    "column_count": 1,
+                    "missing_values": 0,
+                    "duplicate_rows": 0,
+                    "columns": [],
+                    "pii_columns": [],
+                }
+            ],
+        }
+
+        with TemporaryDirectory() as tmpdir:
+            report = Path(tmpdir) / "report.html"
+            generate_report(profile, report)
+            html = report.read_text(encoding="utf-8")
+
+        self.assertIn("No obvious PII columns were detected based on configured rules.", html)
 
     def test_profiles_valid_xls_file(self) -> None:
         with TemporaryDirectory() as tmpdir:
