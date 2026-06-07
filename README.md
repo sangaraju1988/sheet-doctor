@@ -1,70 +1,132 @@
 # Sheet Doctor
 
-A lightweight Python CLI tool that profiles Excel workbooks and generates data quality reports.
-Sheet Doctor supports modern `.xlsx` workbooks and legacy `.xls` workbooks.
+Sheet Doctor is an open-source Python-based Excel profiling and data quality assessment tool designed for analysts, BI developers, data engineers, and business users.
 
-## Features
-
-### Workbook Analysis
-
-* Multi-sheet workbook support
-* Row and column counts
-* Sheet-level statistics
-* Workbook overview summary
-
-### Data Profiling
-
-* Automatic data type detection
-* Missing value analysis
-* Unique value counts
-* Numeric column statistics
-
-  * Minimum
-  * Maximum
-  * Average
-* Text column profiling
-
-  * Top 5 most frequent values
-
-### Data Quality Checks
-
-* Duplicate row detection
-* Blank column detection
-* High missing-value identification
-* Numeric values stored as text detection
-
-### PII Detection
-
-* Zero-configuration PII column detection using the default Markdown dictionary in `pii_columns.md`
-* Case-insensitive column-name matching for common variations such as `first_name`, `First Name`, `phone_number`, `mobile`, `ssn`, and `credit_card`
-* Value-pattern checks for likely email addresses, phone numbers, SSNs, and credit card-like numbers
-* Report output includes only metadata such as sheet name, column name, detected PII type, and detection method
-
-### Reporting
-
-* HTML report generation
-* Easy-to-read summary tables
-* BI-ready workbook assessment
+The tool analyzes Excel workbooks and generates BI-ready profiling reports that help users quickly understand data structure, identify quality issues, identify potentially sensitive data, and prepare datasets for reporting and analytics.
 
 ---
 
-## Installation
+# Features
 
-Clone the repository:
+## Workbook Analysis
 
-```bash
-git clone https://github.com/sangaraju1988/sheet-doctor.git
-cd sheet-doctor
-```
+* Multi-sheet workbook support
+* Sheet enumeration
+* Row count
+* Column count
+* Workbook summary
 
-Create a virtual environment:
+## Data Profiling
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
+For each column:
 
-Install dependencies:
+* Data type detection
+* Missing value count
+* Missing percentage
+* Unique value count
+
+### Numeric Columns
+
+* Minimum value
+* Maximum value
+* Mean value
+
+### Text Columns
+
+* Top 5 most frequent values
+
+---
+
+## Data Quality Checks
+
+* Duplicate row detection
+* Blank column detection
+* High missing-value detection
+* Numeric values stored as text
+
+---
+
+## PII Detection (New)
+
+Sheet Doctor can identify columns that may contain Personally Identifiable Information (PII).
+
+### Supported PII Types
+
+* First Name
+* Last Name
+* Full Name
+* Address
+* Email Address
+* Phone Number
+* Social Security Number (SSN)
+* Credit Card Number
+* Date of Birth
+* Passport Number
+* Driver License Number
+* Bank Account Number
+
+### Detection Methods
+
+#### Column Name Detection
+
+Sheet Doctor compares column names against a configurable PII dictionary.
+
+Examples:
+
+* FirstName
+* first_name
+* Last Name
+* Email
+* email_address
+* Phone
+* Mobile
+* SSN
+* CardNumber
+
+#### Pattern-Based Detection
+
+Sheet Doctor can also inspect sample values and identify common patterns such as:
+
+* Email addresses
+* Phone numbers
+* SSNs
+* Credit card-like numbers
+
+For privacy and security reasons, actual values are never displayed in reports.
+
+Only metadata is reported.
+
+---
+
+## PII Detection Summary
+
+A dedicated section is added to the HTML report.
+
+Example:
+
+| Sheet     | Column | PII Type               | Detection Method |
+| --------- | ------ | ---------------------- | ---------------- |
+| Customers | Email  | Email Address          | Column Name      |
+| Customers | Phone  | Phone Number           | Pattern Match    |
+| Employees | SSN    | Social Security Number | Column Name      |
+
+---
+
+## Sensitive Data Warning
+
+If PII is detected, the report displays a warning banner.
+
+Example:
+
+> Warning: This workbook may contain personally identifiable information. Be careful when sharing this file with others or uploading it to AI tools.
+
+If no PII is detected:
+
+> No obvious PII columns were detected based on configured rules.
+
+---
+
+# Installation
 
 ```bash
 pip install -r requirements.txt
@@ -72,138 +134,139 @@ pip install -r requirements.txt
 
 ---
 
-## Usage
+# Usage
 
-Run Sheet Doctor against an Excel workbook:
-
-```bash
-python -m sheet_doctor.cli Financial_Sample.xlsx report.html
-```
-
-Legacy `.xls` workbooks are supported as well:
+Analyze a workbook:
 
 ```bash
-python -m sheet_doctor.cli legacy_sales.xls legacy_report.html
+sheet-doctor scan workbook.xlsx
 ```
 
-More examples:
+Generate an HTML profiling report:
 
 ```bash
-python -m sheet_doctor.cli sales.xlsx report.html
-python -m sheet_doctor.cli legacy_sales.xls report.html
+sheet-doctor scan workbook.xlsx --output report.html
 ```
-
-### Parameters
-
-| Parameter             | Description          |
-| --------------------- | -------------------- |
-| Financial_Sample.xlsx | Input Excel workbook (`.xlsx` or `.xls`) |
-| report.html           | Output report file   |
 
 ---
 
-## Example Output
+# Example Report Sections
 
-Sheet Doctor generates a report containing:
+The generated report may contain:
+
+* Workbook Summary
+* Sheet Statistics
+* Column Profiles
+* Data Quality Findings
+* Duplicate Analysis
+* Missing Data Analysis
+* PII Detection Summary
+
+---
+
+# PII Dictionary
+
+PII identification rules are maintained in:
 
 ```text
-Workbook Summary
-├── Sheet Overview
-├── Row & Column Counts
-
-Data Quality Issues
-├── Missing Values
-├── Duplicate Rows
-├── Blank Columns
-├── Data Type Warnings
-
-PII Detection Summary
-├── Detected PII Columns
-├── Detection Method
-├── Sharing Warning
-
-Column Profiles
-├── Numeric Statistics
-├── Text Frequencies
-├── Unique Counts
-
-HTML Report
+pii_columns.md
 ```
 
-## PII Detection Notes
+The dictionary can be extended to support additional organization-specific fields.
 
-Sheet Doctor's PII detection is heuristic. It checks configured column-name rules from
-`pii_columns.md` and simple value patterns for likely email addresses, phone numbers,
-SSNs, and credit card-like numbers. The report does not store or print actual sensitive
-cell values.
+Example entries:
 
-These rules are intended to flag obvious risks, not to prove a workbook is safe. Users
-should still manually review sensitive workbooks before sharing them or uploading them
-to AI tools.
+```markdown
+## Email
 
----
+- email
+- email_address
+- emailid
 
-## Project Structure
+## Phone Number
 
-```text
-sheet-doctor/
-│
-├── sheet_doctor/
-│   ├── __init__.py
-│   ├── cli.py
-│   ├── profiler.py
-│   └── report.py
-│
-├── templates/
-│   └── report.html
-│
-├── pii_columns.md
-├── README.md
-├── requirements.txt
-└── .gitignore
+- phone
+- phone_number
+- mobile
+- mobile_number
+
+## SSN
+
+- ssn
+- social_security_number
 ```
 
 ---
 
-## Roadmap
+# Limitations
 
-### Version 1.0
+PII detection is heuristic-based and should not be considered a compliance or legal certification.
 
-* [x] Excel workbook profiling
-* [x] Data quality checks
-* [x] HTML report generation
-* [x] PII detection
+False positives and false negatives may occur.
 
-### Version 1.1
+Users should always manually review sensitive workbooks before:
 
-* [ ] Data quality scoring
-* [ ] Export report to Excel
-* [ ] Schema comparison between workbooks
-
-### Version 1.2
-
-* [ ] AI-generated workbook insights
-* [ ] Automatic anomaly detection
-* [ ] Natural language summary generation
-
-### Version 2.0
-
-* [ ] Data governance checks
-* [ ] AI-powered data documentation
-* [ ] Dashboard readiness scoring
+* Sharing with external parties
+* Uploading to AI systems
+* Publishing datasets
+* Distributing reports
 
 ---
 
-## Contributing
+# Supported Formats
 
-Contributions, feature requests, and bug reports are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+* XLSX
+* XLS
 
 ---
 
-## License
+# Roadmap
 
-MIT
+## Version 1.1
+
+* Data Quality Score
+* Excel Export
+* Schema Comparison
+
+## Version 1.2
+
+* AI Insights
+* Anomaly Detection
+* Executive Workbook Summaries
+
+## Version 2.0
+
+* Enhanced PII Detection
+* Data Classification
+* Compliance Readiness Checks
+* AI-generated Data Dictionaries
+* Data Governance Insights
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+Potential areas:
+
+* Additional PII patterns
+* Industry-specific classifications
+* Performance improvements
+* New report visualizations
+* Additional file formats
+
+---
+
+# Security Notice
+
+Sheet Doctor helps identify potentially sensitive information but does not guarantee complete detection of all PII, confidential, regulated, or protected data.
+
+Always apply appropriate security, privacy, and governance controls when handling spreadsheets containing sensitive information.
+
+---
+
+# License
+
+Open Source.
+See the project's LICENSE file for details.
